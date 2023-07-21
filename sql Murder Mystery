@@ -1,0 +1,56 @@
+/* First is to retrieve the corresponding crime scene report from the police department’s database. */
+
+SELECT *
+FROM crime_scene_report
+WHERE type = 'murder' AND date = 20180115 AND city = 'SQL City'
+
+/* Next is to get the description. Security footage shows that there were 2 witnesses. The first witness lives 
+at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".*/
+
+SELECT id, name,address_number, address_street_name
+FROM person
+WHERE address_street_name = "Northwestern Dr"
+ORDER BY address_number DESC
+LIMIT 1
+
+/* Query for second witness */
+SELECT *
+FROM person
+where name LIKE '%Annabel%'
+AND address_street_name = "Franklin Ave"
+
+/* First witness is Morty Schapiro with ID 14887
+Second witness is Annabel Miller with ID 16371 */
+
+/* Now we run a query to view their interview transcripts */
+
+SELECT transcript
+FROM interview
+WHERE person_id In (14887, 16371)
+
+/* First witness, Morty Schapiro says, "I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. 
+The membership number on the bag started with "48Z". Only gold members have those bags. 
+The man got into a car with a plate that included "H42W".
+
+Second witness, Annabel Miller says, I saw the murder happen, 
+and I recognized the killer from my gym when I was working out last week on January the 9th. */
+
+/* with these statements, we know that our killer is a man, a registered gold gym member with a customized gym bag with 
+number 48Z... and with a car that had a plate number that inluded "H42W". Also, the man was at the gym on the 9th of Jan */
+
+/* Now we will query the gym database and look for members with that gym bag */
+
+SELECT * 
+FROM get_fit_now_member
+WHERE membership_status = 'gold'
+AND id LIKE '48Z%'
+
+/* Now that we have two suspects, we will join person table and drivers_license table  to look up their car details */
+
+SELECT p.name, d.plate_number
+FROM person p
+JOIN drivers_license d 
+ON d.id = p.license_id
+WHERE d.plate_number LIKE "%H42W%"
+
+/* Now we have our murderer to be Jeremy Bowers */ 
